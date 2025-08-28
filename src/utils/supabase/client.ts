@@ -1,0 +1,221 @@
+// supabase.ts
+import { createClient } from '@supabase/supabase-js'
+
+/**
+ * Database types
+ * (exactly as in your Figma export, kept intact)
+ */
+export type Database = {
+  public: {
+    Tables: {
+      containers: {
+        Row: {
+          id: string
+          name: string
+          type: 'box_9x9' | 'box_5x5' | 'rack_5x4' | 'rack_9x9'
+          sample_type: 'BC Tubes' | 'Plasma Tubes' | null
+          status: 'active' | 'training' | 'archived'
+          location_freezer: string
+          location_rack?: string
+          location_drawer?: string
+          samples: any
+          created_at: string
+          created_by: string
+          updated_at: string
+          updated_by: string
+          locked_by?: string
+          locked_at?: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          type: 'box_9x9' | 'box_5x5' | 'rack_5x4' | 'rack_9x9'
+          sample_type?: 'BC Tubes' | 'Plasma Tubes' | null
+          status?: 'active' | 'training' | 'archived'
+          location_freezer: string
+          location_rack?: string
+          location_drawer?: string
+          samples?: any
+          created_by: string
+          updated_by: string
+          locked_by?: string
+          locked_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          type?: 'box_9x9' | 'box_5x5' | 'rack_5x4' | 'rack_9x9'
+          sample_type?: 'BC Tubes' | 'Plasma Tubes' | null
+          status?: 'active' | 'training' | 'archived'
+          location_freezer?: string
+          location_rack?: string
+          location_drawer?: string
+          samples?: any
+          updated_by?: string
+          locked_by?: string
+          locked_at?: string
+        }
+      }
+      users: {
+        Row: {
+          id: string
+          username: string
+          email: string
+          full_name: string
+          role_id: string
+          is_active: boolean
+          created_at: string
+          created_by: string
+          updated_at: string
+          last_login?: string
+        }
+        Insert: {
+          id?: string
+          username: string
+          email: string
+          full_name: string
+          role_id: string
+          is_active?: boolean
+          created_by: string
+        }
+        Update: {
+          id?: string
+          username?: string
+          email?: string
+          full_name?: string
+          role_id?: string
+          is_active?: boolean
+          updated_at?: string
+          last_login?: string
+        }
+      }
+      user_roles: {
+        Row: {
+          id: string
+          name: string
+          level: number
+          permissions: any
+          color: string
+          description: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          level: number
+          permissions: any
+          color: string
+          description: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          level?: number
+          permissions?: any
+          color?: string
+          description?: string
+        }
+      }
+      audit_logs: {
+        Row: {
+          id: string
+          action_type: string
+          resource_type: string
+          resource_id: string
+          user_id: string
+          user_name: string
+          details: any
+          old_values?: any
+          new_values?: any
+          metadata?: any
+          severity: 'low' | 'medium' | 'high' | 'critical'
+          success: boolean
+          timestamp: string
+        }
+        Insert: {
+          id?: string
+          action_type: string
+          resource_type: string
+          resource_id: string
+          user_id: string
+          user_name: string
+          details?: any
+          old_values?: any
+          new_values?: any
+          metadata?: any
+          severity?: 'low' | 'medium' | 'high' | 'critical'
+          success?: boolean
+        }
+        Update: {
+          id?: string
+          action_type?: string
+          resource_type?: string
+          resource_id?: string
+          user_id?: string
+          user_name?: string
+          details?: any
+          old_values?: any
+          new_values?: any
+          metadata?: any
+          severity?: 'low' | 'medium' | 'high' | 'critical'
+          success?: boolean
+        }
+      }
+      user_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          user_name: string
+          activity_type: string
+          container_id?: string
+          last_seen: string
+          status: 'active' | 'idle' | 'offline'
+          metadata?: any
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          user_name: string
+          activity_type: string
+          container_id?: string
+          status?: 'active' | 'idle' | 'offline'
+          metadata?: any
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          user_name?: string
+          activity_type?: string
+          container_id?: string
+          last_seen?: string
+          status?: 'active' | 'idle' | 'offline'
+          metadata?: any
+        }
+      }
+    }
+  }
+}
+
+// Pull from Vite env (no ./info file needed)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
+}
+
+// Typed client
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+})
+
+// Handy re-exports for table row types (optional)
+export type Container = Database['public']['Tables']['containers']['Row']
+export type User = Database['public']['Tables']['users']['Row']
+export type UserRole = Database['public']['Tables']['user_roles']['Row']
+export type AuditLog = Database['public']['Tables']['audit_logs']['Row']
+export type UserSession = Database['public']['Tables']['user_sessions']['Row']
